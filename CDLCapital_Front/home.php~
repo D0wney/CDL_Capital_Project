@@ -1,0 +1,62 @@
+<?php include 'header.php';?>
+
+<!DOCTYPE html>
+<html>
+    
+<head>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="front_end_functions.js"></script>
+</head>
+
+<body>
+  <form>
+    <select id="select_company" name="users" onchange="draw_graph(this.value, 365)">
+      <option value="">Select Company</option>
+      <?php
+        $dbuser="kc343";
+        $dbname="kc343";
+        $dbpass="njitdb123";
+        $dbhost="sql1.njit.edu";
+        // Make a MySQL Connection
+        $con = mysql_connect($dbhost, $dbuser, $dbpass) or die(mysql_error());
+        mysql_select_db($dbname, $con) or die(mysql_error());
+        // Create a Query
+        $sql_query = "SELECT company FROM companies;";
+        // Execute query
+        $result = mysql_query($sql_query) or die(mysql_error());
+        while ($row = mysql_fetch_array($result)){
+        echo "<option value='" . $row['company'] . "'>". $row['company'] ."</option>";
+        }
+        mysql_close($con);
+      ?>
+    </select>
+  </form>
+  <input id="years1" type="button" value="1 Year" onclick="display_graph_stats(select_company.value, 365);" />
+  <input id="months6" type="button" value="6 Months" onclick="display_graph_stats(select_company.value, 180);" />
+  <input id="months3" type="button" value="3 Months" onclick="display_graph_stats(select_company.value, 90);" />
+  <input id="months1" type="button" value="1 Month" onclick="display_graph_stats(select_company.value, 30);" />
+  <input id="weeks2" type="button" value="2 Weeks" onclick="display_graph_stats(select_company.value, 14);" />
+  <input id="weeks1" type="button" value="1 Week" onclick="display_graph_stats(select_company.value, 7);" />
+  <input id="delete" type="button" value="Delete Graph" onclick="del_graph(select_company.value);" />
+
+  <br/><br/><div id="graph_div" style="width:800px; height:500px;"></div>
+  <div id="data_div"><br/>
+  <button id="linReg" onclick="linear_regression()">Linear Regression</button>
+<button id="clear_linReg" onclick="clear_lines()">Clear Regression</button><br/>
+  	<div id="max_div"></div>
+  	<div id="min_div"></div>
+	<div id="avg_div"></div>
+	<div id="sd_div"></div>
+        <div id="py_test"></div>
+	  <div id="py_test2"></div>
+  </div><br/>
+<form>
+    <br/><b>Call Option Simulator</b><br/><br/>
+    <label>Strike Price </label><input id="strike_price" type="text" name="strike_price"/><br/>
+    <label>Expiration Days </label><input id="num_days" type="text" name="num_days"/><br/>
+    <input id="calc" type="button" value="Calculate" onclick="calc_python(select_company.value);"/> 
+  </form><br/><br/>
+</body>
+
+</html>

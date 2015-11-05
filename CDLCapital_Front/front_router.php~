@@ -1,0 +1,175 @@
+<?php
+   // FRONT ROUTER
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+  if($_POST["m"]){
+	$c=$_POST["c"];
+	$t=$_POST["t"];
+	$m=$_POST["m"];
+	$myvars = 'c=' . $c . '&t=' . $t . '&m=' . $m;
+	$ch = curl_init( 'https://web.njit.edu/~al356/CDLCapital/index.php' );
+        curl_setopt( $ch, CURLOPT_POST, 1);
+        curl_setopt( $ch, CURLOPT_POSTFIELDS, $myvars);
+        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt( $ch, CURLOPT_HEADER, 0);
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+	    echo $result;
+        curl_close($ch);
+
+   }else if($_POST["g"]){
+   	 
+	$c=$_POST["c"];
+	$t=$_POST["t"];
+	$g=$_POST["g"];
+	$myvars = 'c=' . $c . '&t=' . $t . '&g=' . $g;
+	$ch = curl_init( 'https://web.njit.edu/~al356/CDLCapital/index.php' );
+        curl_setopt( $ch, CURLOPT_POST, 1);
+        curl_setopt( $ch, CURLOPT_POSTFIELDS, $myvars);
+        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt( $ch, CURLOPT_HEADER, 0);
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+	    echo $result;
+        curl_close($ch);
+	
+    }else if ($_POST['login']) {
+    
+        $login = $_POST['login'];
+        $name = htmlspecialchars($_POST['name']);
+        $password  = htmlspecialchars($_POST['password']);
+
+        $ch = curl_init( 'https://web.njit.edu/~al356/CDLCapital/index.php' );
+        $myvars = 'name=' . $name . '&password=' . $password . '&login=' . $login;
+        curl_setopt( $ch, CURLOPT_POST, 1);
+        curl_setopt( $ch, CURLOPT_POSTFIELDS, $myvars);
+        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt( $ch, CURLOPT_HEADER, 0);
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        //echo $result;
+        if($result != false){
+            header('Location: https://web.njit.edu/~al356/CDLCapital/home.php');
+        }else{
+            header('Location: https://web.njit.edu/~al356/CDLCapital/login_view.php');
+        }
+        
+    }else if($_POST['register']){
+        
+        $register = $_POST['register'];
+        $name = htmlspecialchars($_POST['name']);
+        $password  = htmlspecialchars($_POST['password']);
+
+        $ch = curl_init( 'https://web.njit.edu/~al356/CDLCapital/index.php' );
+        $myvars = 'name=' . $name . '&password=' . $password . '&register=' . $register;
+        curl_setopt( $ch, CURLOPT_POST, 1);
+        curl_setopt( $ch, CURLOPT_POSTFIELDS, $myvars);
+        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt( $ch, CURLOPT_HEADER, 0);
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        //echo $result;
+        if($result == true){
+            header('Location: https://web.njit.edu/~al356/CDLCapital/home.php');
+        }else{
+            header('Location: https://web.njit.edu/~al356/CDLCapital/register.php');
+        }
+        
+    }else if ($_POST['upload']){
+        
+        //$filename = $_FILES['file']['name'];
+        $upload = $_POST['upload'];
+        $date = "";
+        $open = "";
+        $high = "";
+        $low = "";
+        $close = "";
+        $volume = "";
+        $adj_close = "";
+        //$string = '';
+        $row = 0;
+        $stock_3D_array = array();
+        
+        if(($handle = fopen($_FILES["file"]["tmp_name"], "r")) !== FALSE) 
+        {
+            while(($line = fgetcsv($handle,9999,",")) !== FALSE)
+            {
+                if($row == 0){
+                    $date = $line[0];
+                    $open = $line[1];
+                    $high = $line[2];
+                    $low = $line[3];
+                    $close = $line[4];
+                    $volume = $line[5];
+                    $adj_close = $line[6];
+                    //echo $line;
+                    $row = 1;
+                    $fname = [$_FILES["file"]["name"]];
+                    //echo $fname;
+                    //echo $fname[0];
+                    array_push($stock_3D_array, $fname);
+                    continue;
+                }
+                array_push($stock_3D_array, $line);       
+            }
+        }
+        fclose($handle);
+	
+        // CURL
+        $ch = curl_init( 'https://web.njit.edu/~al356/CDLCapital/index.php' );
+        $myvars = json_encode($stock_3D_array);
+        curl_setopt( $ch, CURLOPT_POST, 1);
+        curl_setopt( $ch, CURLOPT_POSTFIELDS, $myvars);
+        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt( $ch, CURLOPT_HEADER, 0);
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(                                                   
+            'Content-Type: application/json',                                                        
+            'Content-Length: ' . strlen($myvars))                                                     
+        );               
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        if($result){
+            header('Location: https://web.njit.edu/~al356/CDLCapital/home.php');
+        }else{
+            header('Location: https://web.njit.edu/~al356/CDLCapital/upload.php');
+        }
+        
+  }/*else if ($_POST["sp"]){
+    $sp=$_POST["sp"];
+	$n=$_POST["n"];
+	$c=$_POST["c"];
+        $myvars = 'sp=' . $sp . '&n=' . $n . '&c='. $c;
+	$ch = curl_init( 'https://web.njit.edu/~al356/CDLCapital/index.php' );
+        curl_setopt( $ch, CURLOPT_POST, 1);
+        curl_setopt( $ch, CURLOPT_POSTFIELDS, $myvars);
+        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt( $ch, CURLOPT_HEADER, 0);
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+	   echo $result;
+        curl_close($ch);
+    }*/
+    else if ($_POST["sp"]){
+        $sp=$_POST["sp"];
+        $n=$_POST["n"];
+        $c=$_POST["c"];
+        echo $sp;
+        /*$myvars = 'sp=' . $sp . '&n=' . $n . '&c='. $c;
+        $ch = curl_init( 'https://web.njit.edu/~al356/CDLCapital/index.php' );
+        curl_setopt( $ch, CURLOPT_POST, 1);
+        curl_setopt( $ch, CURLOPT_POSTFIELDS, $myvars);
+        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt( $ch, CURLOPT_HEADER, 0);
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+        echo $result;
+        curl_close($ch);*/
+    }
+    
+}
+
+?>
